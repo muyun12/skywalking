@@ -149,6 +149,12 @@ public abstract class AbstractTracingSpan implements AbstractSpan {
      */
     @Override
     public AbstractTracingSpan log(Throwable t) {
+        if ("com.wtyt.money.commons.exception.BaseConfirmException".equals(t.getClass().getName())
+            || "com.wtyt.money.commons.exception.BaseTipException".equals(t.getClass().getName())
+            || "com.wtyt.money.commons.exception.BaseCustomException".equals(t.getClass().getName())) {
+            this.errorOccurred = false;
+            return this;
+        }
         if (logs == null) {
             logs = new LinkedList<LogDataEntity>();
         }
