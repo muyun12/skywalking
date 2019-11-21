@@ -23,6 +23,7 @@ import org.apache.skywalking.apm.agent.core.context.*;
 import org.apache.skywalking.apm.agent.core.context.tag.*;
 import org.apache.skywalking.apm.agent.core.context.util.*;
 import org.apache.skywalking.apm.agent.core.dictionary.DictionaryUtil;
+import org.apache.skywalking.apm.agent.core.util.IgnoreExceptionUtil;
 import org.apache.skywalking.apm.network.language.agent.SpanType;
 import org.apache.skywalking.apm.network.language.agent.v2.SpanObjectV2;
 import org.apache.skywalking.apm.network.trace.component.Component;
@@ -149,9 +150,7 @@ public abstract class AbstractTracingSpan implements AbstractSpan {
      */
     @Override
     public AbstractTracingSpan log(Throwable t) {
-        if ("com.wtyt.money.commons.exception.BaseConfirmException".equals(t.getClass().getName())
-            || "com.wtyt.money.commons.exception.BaseTipException".equals(t.getClass().getName())
-            || "com.wtyt.money.commons.exception.BaseCustomException".equals(t.getClass().getName())) {
+        if (IgnoreExceptionUtil.ignore(t.getClass().getName())) {
             this.errorOccurred = false;
             return this;
         }
