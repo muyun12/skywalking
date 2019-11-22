@@ -27,7 +27,7 @@ import java.util.List;
  */
 public class IgnoreExceptionUtil {
 
-    private static final List<String> EX_LIST = new ArrayList<String>();
+    public static final List<String> EX_LIST = new ArrayList<String>();
 
     static {
         EX_LIST.add("com.wtyt.money.commons.exception.BaseConfirmException");
@@ -38,15 +38,5 @@ public class IgnoreExceptionUtil {
 
     private IgnoreExceptionUtil(){
         // prevent instantiation
-    }
-
-    /**
-     * ignore the exception
-     *
-     * @param className
-     * @return
-     */
-    public static boolean ignore(String className){
-        return EX_LIST.contains(className);
     }
 }

@@ -150,7 +150,7 @@ public abstract class AbstractTracingSpan implements AbstractSpan {
      */
     @Override
     public AbstractTracingSpan log(Throwable t) {
-        if (IgnoreExceptionUtil.ignore(t.getClass().getName())) {
+        if (IgnoreExceptionUtil.EX_LIST.contains(t.getClass().getName())) {
             this.errorOccurred = false;
             return this;
         }
