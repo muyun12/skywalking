@@ -18,6 +18,12 @@
 
 package org.apache.skywalking.apm.agent.core.util;
 
+import org.apache.skywalking.apm.agent.core.boot.AgentPackagePath;
+import org.apache.skywalking.apm.agent.core.conf.ConfigNotFoundException;
+import org.apache.skywalking.apm.agent.core.logging.api.ILog;
+import org.apache.skywalking.apm.agent.core.logging.api.LogManager;
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,13 +33,39 @@ import java.util.List;
  */
 public class IgnoreExceptionUtil {
 
+    private static final ILog logger = LogManager.getLogger(IgnoreExceptionUtil.class);
+    // ignore exceptions config file name
+    private static final String CONFIG_FILE_NAME = "ignore_exceptions.config";
+    private static final String FAIL_TO_LOAD_CONFIG = "Failed to load " + CONFIG_FILE_NAME + ".";
     public static final List<String> EX_LIST = new ArrayList<String>();
 
     static {
-        EX_LIST.add("com.wtyt.money.commons.exception.BaseConfirmException");
-        EX_LIST.add("com.wtyt.money.commons.exception.BaseTipException");
-        EX_LIST.add("com.wtyt.money.commons.exception.BaseCustomException");
-        EX_LIST.add("com.wtyt.util.base.exception.BaseException");
+        BufferedReader bufferedReader = null;
+        try {
+            File configFile = new File(AgentPackagePath.getPath(), CONFIG_FILE_NAME);
+            if (configFile.exists() && configFile.isFile()) {
+                logger.info("Config file found in {}.", configFile);
+                bufferedReader = new BufferedReader(new FileReader(configFile));
+                for (;;) {
+                    String ex = bufferedReader.readLine();
+                    if (null == ex) {
+                        break;
+                    }
+                    EX_LIST.add(ex);
+                }
+            }
+            throw new ConfigNotFoundException(FAIL_TO_LOAD_CONFIG);
+        } catch (Exception e) {
+            logger.error("Fail to init ignore exception config.", e);
+        } finally {
+            if (null != bufferedReader) {
+                try {
+                    bufferedReader.close();
+                } catch (IOException e) {
+                    logger.error("close buffer reader error.", e);
+                }
+            }
+        }
     }
 
     private IgnoreExceptionUtil(){
