@@ -35,16 +35,17 @@ public class IgnoreExceptionUtil {
 
     private static final ILog logger = LogManager.getLogger(IgnoreExceptionUtil.class);
     // ignore exceptions config file name
-    private static final String CONFIG_FILE_NAME = "ignore_exceptions.config";
+    private static final String CONFIG_FILE_NAME = "/config/ignore_exceptions.config";
     private static final String FAIL_TO_LOAD_CONFIG = "Failed to load " + CONFIG_FILE_NAME + ".";
     public static final List<String> EX_LIST = new ArrayList<String>();
 
-    static {
+    public static void initialize() {
+        logger.info("Start to init ignore exceptions config.");
         BufferedReader bufferedReader = null;
         try {
             File configFile = new File(AgentPackagePath.getPath(), CONFIG_FILE_NAME);
             if (configFile.exists() && configFile.isFile()) {
-                logger.info("Config file found in {}.", configFile);
+                logger.info("Ignore Exceptions Config file found in {}.", configFile);
                 bufferedReader = new BufferedReader(new FileReader(configFile));
                 for (;;) {
                     String ex = bufferedReader.readLine();
@@ -53,8 +54,13 @@ public class IgnoreExceptionUtil {
                     }
                     EX_LIST.add(ex);
                 }
+            } else {
+                throw new ConfigNotFoundException(FAIL_TO_LOAD_CONFIG);
             }
-            throw new ConfigNotFoundException(FAIL_TO_LOAD_CONFIG);
+            logger.info("Ignore the exceptions below:");
+            for (String ex : EX_LIST) {
+                logger.info(ex);
+            }
         } catch (Exception e) {
             logger.error("Fail to init ignore exception config.", e);
         } finally {
@@ -70,5 +76,9 @@ public class IgnoreExceptionUtil {
 
     private IgnoreExceptionUtil(){
         // prevent instantiation
+    }
+
+    public static void main(String[] args) {
+        IgnoreExceptionUtil.initialize();
     }
 }
